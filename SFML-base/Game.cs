@@ -19,6 +19,10 @@ namespace SFML_base
         RenderWindow rw;
         View mainView;
 
+        public static Clock GameTime = new Clock();
+
+        CircleShape debugCircle;
+
         public Game()
         {
             rw = new RenderWindow(new VideoMode(_WIDTH, _HEIGHT), "SFML-program", Styles.Close, new ContextSettings(32, 32, 4, 1, 0));
@@ -31,6 +35,10 @@ namespace SFML_base
             fpsText.Font = new Font("Roboto-Regular.ttf");
             fpsText.Scale = new Vector2f(0.45f, 0.45f);
             fpsClock = new Clock();
+
+            debugCircle = new CircleShape(25.0f);
+
+            GameTime.Restart();
         }
 
         void rw_Closed(object sender, EventArgs e)
@@ -52,7 +60,6 @@ namespace SFML_base
 
                 while(timeSinceLastUpdate > TimePerFrame)
                 {
-                    Console.WriteLine(timeSinceLastUpdate.AsMilliseconds() + ", " + TimePerFrame.AsMilliseconds());
                     timeSinceLastUpdate -= TimePerFrame;
                     rw.DispatchEvents();
 
@@ -68,14 +75,22 @@ namespace SFML_base
         private void update(Time time)
         {
             rw.SetView(mainView);
+
+            float newX = 200 + (float)Math.Sin(GameTime.ElapsedTime.AsSeconds() * 10) * 5000 * time.AsSeconds();
+            float newY = 200 + (float)Math.Cos(GameTime.ElapsedTime.AsSeconds() * 10) * 5000 * time.AsSeconds();
+
+            debugCircle.Position = new Vector2f(newX, newY);
         }
 
         private void render()
         {
             rw.Clear(Color.Black);
 
+            rw.Draw(debugCircle);
+
             rw.SetView(rw.GetView());
             rw.Draw(fpsText);
+
             rw.SetView(mainView);
 
             rw.Display();
